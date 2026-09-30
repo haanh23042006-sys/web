@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Quản Lý Cá Nhân - ARTFAIR User Dashboard</title>
+  <meta name="description" content="Trung tâm quản lý bản quyền đã mua, tiến độ đơn hàng Commission và Creator Studio tại ARTFAIR.">
+
+  <!-- Google Fonts: Oswald (Primary Headings & Titles) & Plus Jakarta Sans (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+<style>
+    /* ======================================================= */
+    /* 1. ẨN TRIỆT ĐỂ TẤT CẢ MENU DI ĐỘNG TRÊN MÁY TÍNH        */
+    /* ======================================================= */
+    .mobile-nav-drawer,
+    #mobileNavDrawer,
+    .artist-mobile-drawer,
+    #artistMobileDrawer,
+    .artist-nav-drawer,
+    #artistNavDrawer,
+    .booth-mobile-drawer,
+    #boothMobileDrawer,
+    [class*="mobile-drawer"],
+    [class*="artist-drawer"],
+    [id*="mobileDrawer"],
+    [id*="MobileDrawer"] {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+    }
+
+    /* ======================================================= */
+    /* 2. SỬA NHÃN COMMISSION XANH KHÔNG BAO GIỜ ĐÈ LÊN CHỮ   */
+    /* ======================================================= */
+    .artist-commission-status,
+    .commission-status-pill,
+    .artist-commission-badge,
+    .status-badge-pill,
+    [class*="commission-status"],
+    [class*="status-badge"],
+    [class*="availability"] {
+      position: static !important; /* Gỡ bỏ absolute để không đè lên chữ */
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      white-space: normal !important; /* Cho phép xuống dòng nếu dài */
+      max-width: 130px !important;
+      text-align: center !important;
+      margin: 8px auto 0 auto !important;
+      font-size: 0.72rem !important;
+      line-height: 1.3 !important;
+      background: #ecfdf5 !important;
+      color: #059669 !important;
+      border: 1px solid #a7f3d0 !important;
+      padding: 4px 8px !important;
+      border-radius: 12px !important;
+      transform: none !important;
+    }
+
+    /* ======================================================= */
+    /* 3. CHUẨN HÓA THẺ TÁC GIẢ ĐANG THEO DÕI (CARDS & BUTTONS)*/
+    /* ======================================================= */
+    #followingArtistsGrid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+      gap: 24px !important;
+      align-items: stretch !important;
+    }
+
+    /* Thẻ tác giả chính */
+    #followingArtistsGrid .booth-card,
+    #followingArtistsGrid > div {
+      background: #ffffff !important;
+      border-radius: 20px !important;
+      border: 1px solid #f0f0f0 !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: visible !important; /* Không cắt mất nửa trên của avatar */
+      position: relative !important;
+    }
+
+    /* Dải Banner trên đầu thẻ */
+    #followingArtistsGrid .booth-banner,
+    #followingArtistsGrid [class*="banner"] {
+      height: 95px !important;
+      width: 100% !important;
+      border-radius: 20px 20px 0 0 !important;
+      overflow: hidden !important;
+      position: relative !important;
+      z-index: 1 !important;
+    }
+
+    #followingArtistsGrid .booth-banner img,
+    #followingArtistsGrid [class*="banner"] img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+
+    /* Khung Avatar tròn nổi 50% giữa banner và thân thẻ */
+    #followingArtistsGrid .booth-avatar-box,
+    #followingArtistsGrid [class*="avatar-box"],
+    #followingArtistsGrid [class*="avatar-wrap"] {
+      width: 72px !important;
+      height: 72px !important;
+      margin: -36px auto 0 auto !important; /* Đẩy nổi lên trên dải banner */
+      position: relative !important;
+      z-index: 10 !important;
+    }
+
+    #followingArtistsGrid .booth-avatar,
+    #followingArtistsGrid img[class*="avatar"],
+    #followingArtistsGrid [class*="avatar-box"] img {
+      width: 72px !important;
+      height: 72px !important;
+      border-radius: 50% !important;
+      border: 3.5px solid #ffffff !important;
+      object-fit: cover !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+      display: block !important;
+      background: #ffffff !important;
+    }
+
+    /* Thân thẻ thông tin nghệ sĩ */
+    #followingArtistsGrid .booth-body,
+    #followingArtistsGrid [class*="body"] {
+      padding: 12px 18px 18px 18px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      flex-grow: 1 !important;
+      text-align: center !important;
+    }
+
+    /* GOM 2 NÚT BẤM VÀO CÙNG 1 HÀNG CÂN ĐỐI */
+    #followingArtistsGrid .booth-actions,
+    #followingArtistsGrid [class*="actions"],
+    #followingArtistsGrid [class*="action"] {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 8px !important;
+      width: 100% !important;
+      margin-top: auto !important;
+      padding-top: 14px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Nút chính "GHÉ GIAN HÀNG" co giãn chiếm phần lớn diện tích */
+    #followingArtistsGrid .booth-actions button:first-child,
+    #followingArtistsGrid [class*="actions"] button:first-child {
+      flex: 1 !important;
+      width: auto !important; /* Gỡ bỏ width: 100% ép buộc của class w-100 */
+      height: 38px !important;
+      padding: 0 12px !important;
+      font-size: 0.8rem !important;
+      font-weight: 700 !important;
+      border-radius: 10px !important;
+      white-space: nowrap !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+    }
+
+    /* Nút icon hủy theo dõi (người có dấu trừ) thu thành ô vuông bo góc bên phải */
+    #followingArtistsGrid .booth-actions button:last-child:not(:first-child),
+    #followingArtistsGrid [class*="actions"] button:last-child:not(:first-child),
+    #followingArtistsGrid button:has(.fa-user-minus),
+    #followingArtistsGrid button:has(.fa-user-xmark) {
+      width: 38px !important;
+      height: 38px !important;
+      min-width: 38px !important;
+      flex: 0 0 38px !important;
+      border-radius: 10px !important;
+      border: 1px solid #fee2e2 !important;
+      background: #fff5f5 !important;
+      color: #ef4444 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer !important;
+      font-size: 0.85rem !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      transition: all 0.2s ease !important;
+    }
+
+    #followingArtistsGrid .booth-actions button:last-child:hover,
+    #followingArtistsGrid [class*="actions"] button:last-child:hover {
+      background: #fee2e2 !important;
+      border-color: #fca5a5 !important;
+    }
+#commissionInboxList {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 20px !important;
+      margin-top: 16px !important;
+    }
+
+    /* Đóng khung thành Card ngang sang trọng */
+    #commissionInboxList > div,
+    .commission-inbox-item,
+    .inbox-request-card {
+      display: flex !important;
+      flex-direction: row !important;
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 20px !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+      padding: 22px !important;
+      gap: 24px !important;
+      align-items: stretch !important;
+      transition: all 0.25s ease !important;
+    }
+
+    #commissionInboxList > div:hover {
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+      border-color: #cbd5e1 !important;
+      transform: translateY(-2px) !important;
+    }
+
+    /* 1. Thu gọn ảnh tham khảo (Moodboard) thành Thumbnail cân đối */
+    #commissionInboxList img {
+      width: 220px !important;
+      max-width: 220px !important;
+      height: 250px !important;
+      object-fit: cover !important;
+      border-radius: 14px !important;
+      border: 1px solid #f1f5f9 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+      flex-shrink: 0 !important;
+      display: block !important;
+    }
+
+    /* 2. Cột thông tin chi tiết bên phải */
+    #commissionInboxList > div > div:not(:has(img)) {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      flex: 1 !important;
+      gap: 10px !important;
+    }
+
+    /* Tiêu đề dự án */
+    #commissionInboxList h4,
+    #commissionInboxList h3,
+    #commissionInboxList [class*="title"] {
+      font-size: 1.15rem !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+      margin: 0 !important;
+      line-height: 1.35 !important;
+    }
+
+    /* Hàng thông tin khách hàng & Ngân sách */
+    #commissionInboxList p {
+      font-size: 0.85rem !important;
+      color: #475569 !important;
+      margin: 0 !important;
+      line-height: 1.5 !important;
+    }
+
+    /* Nổi bật ngân sách $350 USD */
+    #commissionInboxList strong {
+      color: #ef4444 !important;
+      font-weight: 800 !important;
+    }
+
+    /* Đóng khung riêng cho phần trích dẫn yêu cầu Brief */
+    #commissionInboxList p:has(em),
+    #commissionInboxList [class*="brief-desc"],
+    #commissionInboxList p:nth-of-type(3) {
+      background: #f8fafc !important;
+      border-left: 3px solid #ef4444 !important;
+      padding: 10px 14px !important;
+      border-radius: 0 10px 10px 0 !important;
+      font-style: italic !important;
+      color: #334155 !important;
+      font-size: 0.82rem !important;
+    }
+
+    /* 3. Cụm nút hành động (Chấp nhận / Từ chối) */
+    #commissionInboxList .inbox-actions,
+    #commissionInboxList [class*="action"],
+    #commissionInboxList > div > div > div:last-child {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      margin-top: 6px !important;
+    }
+
+    /* Nút "CHẤP NHẬN VẼ BRIEF NÀY" nổi bật */
+    #commissionInboxList button:first-child,
+    #commissionInboxList .btn-primary {
+      background: linear-gradient(135deg, #f87171, #ef4444) !important;
+      color: #ffffff !important;
+      border: none !important;
+      padding: 9px 20px !important;
+      border-radius: 10px !important;
+      font-size: 0.82rem !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    #commissionInboxList button:first-child:hover {
+      opacity: 0.95 !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Nút "TỪ CHỐI" tinh tế, không làm rối mắt */
+    #commissionInboxList button:last-child:not(:first-child),
+    #commissionInboxList .btn-outline {
+      background: #ffffff !important;
+      border: 1.5px solid #e2e8f0 !important;
+      color: #64748b !important;
+      padding: 8px 18px !important;
+      border-radius: 10px !important;
+      font-size: 0.82rem !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    }
+
+    #commissionInboxList button:last-child:hover {
+      background: #fee2e2 !important;
+      color: #ef4444 !important;
+      border-color: #fca5a5 !important;
+    }
+
+    /* Tự động co về 1 cột trên màn hình điện thoại */
+    @media (max-width: 768px) {
+      #commissionInboxList > div {
+        flex-direction: column !important;
+      }
+      #commissionInboxList img {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 180px !important;
+      }
+    }
+#liveTrackerList {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 20px !important;
+      margin-top: 16px !important;
+    }
+
+    /* Đóng khung thành Card ngang chuyên nghiệp */
+    #liveTrackerList > div,
+    .live-tracker-card,
+    .tracker-item {
+      display: flex !important;
+      flex-direction: row !important;
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 20px !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+      padding: 22px !important;
+      gap: 24px !important;
+      align-items: center !important;
+      transition: all 0.25s ease !important;
+    }
+
+    #liveTrackerList > div:hover {
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08) !important;
+      border-color: #cbd5e1 !important;
+    }
+
+    /* 1. Thu gọn ảnh tham khảo thành hình chữ nhật chuẩn Thumbnail */
+    #liveTrackerList img {
+      width: 220px !important;
+      max-width: 220px !important;
+      height: 230px !important;
+      object-fit: cover !important;
+      border-radius: 14px !important;
+      border: 1px solid #f1f5f9 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+      flex-shrink: 0 !important;
+      display: block !important;
+    }
+
+    /* 2. Cột thông tin chi tiết và thanh tiến trình bên phải */
+    #liveTrackerList > div > div:not(:has(img)) {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      flex: 1 !important;
+      gap: 12px !important;
+      width: 100% !important;
+    }
+
+    /* Tiêu đề tác phẩm */
+    #liveTrackerList h4,
+    #liveTrackerList h3,
+    #liveTrackerList [class*="title"] {
+      font-size: 1.15rem !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+      margin: 0 !important;
+    }
+
+    /* Tên Artist & Mã đơn */
+    #liveTrackerList p {
+      font-size: 0.88rem !important;
+      color: #475569 !important;
+      margin: 0 !important;
+      line-height: 1.5 !important;
+    }
+
+    #liveTrackerList strong {
+      color: #ef4444 !important;
+      font-weight: 800 !important;
+    }
+
+    /* 3. Đóng khung thanh tiến trình Stepper 4 bước bên dưới thông tin */
+    #liveTrackerList [class*="stepper"],
+    #liveTrackerList [class*="tracker-steps"],
+    #liveTrackerList [class*="wizard"],
+    #liveTrackerList > div > div > div:last-child {
+      background: #f8fafc !important;
+      border: 1px solid #f1f5f9 !important;
+      border-radius: 14px !important;
+      padding: 14px 16px !important;
+      margin-top: 8px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Tự động co về 1 cột trên màn hình điện thoại */
+    @media (max-width: 768px) {
+      #liveTrackerList > div {
+        flex-direction: column !important;
+      }
+      #liveTrackerList img {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 180px !important;
+      }
+    }
+#creatorStudioModalOverlay.modal-overlay {
+      position: fixed !important;
+      inset: 0 !important;
+      background: rgba(15, 23, 42, 0.7) !important;
+      backdrop-filter: blur(6px) !important;
+      z-index: 999999 !important;
+      display: none;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 16px !important;
+      box-sizing: border-box !important;
+    }
+
+    #creatorStudioModalOverlay.active {
+      display: flex !important;
+    }
+
+    #creatorStudioModalOverlay .modal-container {
+      width: 100% !important;
+      max-width: 600px !important;
+      background: #ffffff !important;
+      border-radius: 24px !important;
+      padding: 30px !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25) !important;
+      border: 1px solid #f1f5f9 !important;
+      position: relative !important;
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+      box-sizing: border-box !important;
+      animation: modalFadeUp 0.25s ease-out !important;
+    }
+
+    /* Vùng thả ảnh có preview */
+    .upload-dropzone {
+      border: 2px dashed #cbd5e1 !important;
+      border-radius: 14px !important;
+      padding: 24px !important;
+      text-align: center !important;
+      background: #f8fafc !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+
+    .upload-dropzone:hover {
+      border-color: #ef4444 !important;
+      background: #fff5f5 !important;
+    }
+
+    .upload-dropzone img.preview-thumb {
+      max-height: 140px !important;
+      border-radius: 10px !important;
+      object-fit: cover !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+
+    /* Lưới hiển thị các tác phẩm đã đăng của nghệ sĩ */
+    #creatorArtworksGrid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+      gap: 20px !important;
+      margin-top: 20px !important;
+    }
+
+    .creator-art-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 16px !important;
+      overflow: hidden !important;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      transition: transform 0.2s ease !important;
+    }
+
+    .creator-art-card:hover {
+      transform: translateY(-4px) !important;
+      border-color: #fca5a5 !important;
+    }
+
+    .creator-art-card img {
+      width: 100% !important;
+      height: 180px !important;
+      object-fit: cover !important;
+    }
+
+    .creator-art-card .card-info {
+      padding: 14px 16px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      flex: 1 !important;
+    }
+
+    .creator-art-card .art-price-tag {
+      color: #ef4444 !important;
+      font-weight: 800 !important;
+      font-size: 1.05rem !important;
+    }
+#purchasedLicensesGrid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)) !important;
+      gap: 24px !important;
+      margin-top: 18px !important;
+      align-items: stretch !important;
+    }
+
+    /* Đóng khung từng thẻ bản quyền thành Card ngang sang trọng */
+    #purchasedLicensesGrid > div,
+    .purchased-license-card,
+    .license-item-box {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 20px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05) !important;
+      padding: 22px !important;
+      display: flex !important;
+      flex-direction: row !important;
+      gap: 20px !important;
+      align-items: stretch !important;
+      transition: all 0.25s ease !important;
+      box-sizing: border-box !important;
+    }
+
+    #purchasedLicensesGrid > div:hover {
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08) !important;
+      border-color: #cbd5e1 !important;
+      transform: translateY(-2px) !important;
+    }
+
+    /* 1. Ảnh tác phẩm: Chuẩn hóa thành Thumbnail lớn, sắc nét */
+    #purchasedLicensesGrid img {
+      width: 140px !important;
+      min-width: 140px !important;
+      height: 100% !important;
+      min-height: 190px !important;
+      object-fit: cover !important;
+      border-radius: 14px !important;
+      border: 1px solid #f1f5f9 !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
+      flex-shrink: 0 !important;
+      display: block !important;
+    }
+
+    /* 2. Cột thông tin chi tiết bên phải */
+    #purchasedLicensesGrid > div > div:not(:has(img)) {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      flex: 1 !important;
+      min-width: 0 !important; /* Chống vỡ layout khi chữ dài */
+      gap: 8px !important;
+    }
+
+    /* Mã chứng thư bản quyền: Biến thành Huy hiệu Monospace cao cấp */
+    #purchasedLicensesGrid p:first-of-type,
+    #purchasedLicensesGrid [class*="code"],
+    #purchasedLicensesGrid span:first-child {
+      display: inline-block !important;
+      width: fit-content !important;
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+      font-family: monospace !important;
+      font-size: 0.8rem !important;
+      font-weight: 800 !important;
+      padding: 3px 8px !important;
+      border-radius: 6px !important;
+      margin: 0 0 2px 0 !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+
+    /* Tiêu đề tác phẩm */
+    #purchasedLicensesGrid h4,
+    #purchasedLicensesGrid h3,
+    #purchasedLicensesGrid strong:first-of-type {
+      font-size: 1.15rem !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+      margin: 0 !important;
+      line-height: 1.35 !important;
+    }
+
+    /* Dòng thông tin tác giả, gói bản quyền và ngày thanh toán */
+    #purchasedLicensesGrid p {
+      font-size: 0.85rem !important;
+      color: #475569 !important;
+      margin: 0 !important;
+      line-height: 1.5 !important;
+    }
+
+    #purchasedLicensesGrid p strong {
+      color: #1e293b !important;
+      font-weight: 700 !important;
+    }
+
+    /* Nổi bật gói bản quyền bằng màu thương hiệu */
+    #purchasedLicensesGrid p:has(.fa-certificate),
+    #purchasedLicensesGrid p:nth-of-type(3) {
+      color: #ef4444 !important;
+      font-weight: 700 !important;
+    }
+
+    /* 3. Chuẩn hóa cụm nút bấm hành động (Khắc phục hoàn toàn lỗi tràn chữ) */
+    #purchasedLicensesGrid .license-actions,
+    #purchasedLicensesGrid > div > div > div:last-child,
+    #purchasedLicensesGrid > div > div > button:first-of-type {
+      margin-top: 10px !important;
+    }
+
+    /* Xếp 2 nút bấm full bề rộng, ngắt dòng thông minh */
+    #purchasedLicensesGrid button,
+    #purchasedLicensesGrid a.btn,
+    #purchasedLicensesGrid .btn {
+      width: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      font-size: 0.82rem !important;
+      font-weight: 700 !important;
+      border-radius: 10px !important;
+      box-sizing: border-box !important;
+      text-align: center !important;
+      white-space: normal !important; /* Cho phép xuống dòng tự nhiên */
+      line-height: 1.35 !important;
+      padding: 9px 12px !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      margin-bottom: 8px !important;
+    }
+
+    /* Nút chính "TẢI FILE GỐC" nổi bật */
+    #purchasedLicensesGrid button:first-of-type,
+    #purchasedLicensesGrid .btn-primary {
+      background: linear-gradient(135deg, #f87171, #ef4444) !important;
+      color: #ffffff !important;
+      border: none !important;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25) !important;
+    }
+
+    #purchasedLicensesGrid button:first-of-type:hover {
+      opacity: 0.95 !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Nút phụ "XUẤT CHỨNG NHẬN PDF" viền thanh lịch */
+    #purchasedLicensesGrid button:last-of-type:not(:first-of-type),
+    #purchasedLicensesGrid .btn-outline {
+      background: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      color: #475569 !important;
+      margin-bottom: 0 !important;
+    }
+
+    #purchasedLicensesGrid button:last-of-type:hover {
+      background: #f8fafc !important;
+      border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+
+    /* Co về 1 cột trên màn hình điện thoại */
+    @media (max-width: 640px) {
+      #purchasedLicensesGrid {
+        grid-template-columns: 1fr !important;
+      }
+      #purchasedLicensesGrid > div {
+        flex-direction: column !important;
+      }
+      #purchasedLicensesGrid img {
+        width: 100% !important;
+        height: 170px !important;
+        min-height: unset !important;
+      }
+    } 
+.cart-drawer-overlay {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(15, 23, 42, 0.6) !important;
+      backdrop-filter: blur(4px) !important;
+      z-index: 999999 !important;
+      display: none;
+    }
+
+    .cart-drawer-overlay.active,
+    .cart-drawer-overlay.open {
+      display: block !important;
+    }
+
+    /* Thanh trượt ép sát mép phải, ghim footer xuống đáy */
+    .cart-drawer-panel {
+      position: fixed !important;
+      top: 0 !important;
+      right: 0 !important;
+      width: 420px !important;
+      max-width: 90vw !important;
+      height: 100vh !important;
+      background: #ffffff !important;
+      box-shadow: -10px 0 35px rgba(0, 0, 0, 0.18) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      z-index: 1000000 !important;
+      box-sizing: border-box !important;
+      animation: slideInDrawer 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    @keyframes slideInDrawer {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+
+    /* 1. Header giỏ hàng: Căn 2 bên đối xứng, nút đóng bo tròn */
+    .cart-drawer-header {
+      padding: 18px 24px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      border-bottom: 1px solid #f1f5f9 !important;
+      background: #ffffff !important;
+      flex-shrink: 0 !important;
+    }
+
+    .cart-drawer-header h3 {
+      margin: 0 !important;
+      font-size: 1.15rem !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+
+    .cart-drawer-header h3 i {
+      color: #ef4444 !important;
+      font-size: 1.25rem !important;
+    }
+
+    .drawer-close-btn {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 50% !important;
+      font-size: 1.25rem !important;
+      color: #64748b !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      line-height: 1 !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .drawer-close-btn:hover {
+      background: #fee2e2 !important;
+      color: #ef4444 !important;
+      border-color: #fca5a5 !important;
+    }
+
+    /* 2. Thân giỏ hàng: Chiếm trọn khoảng giữa, tự cuộn */
+    .cart-drawer-body {
+      flex: 1 !important;
+      overflow-y: auto !important;
+      padding: 20px 24px !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* 3. Chân giỏ hàng: Ghim chặt cố định sát đáy màn hình */
+    .cart-drawer-footer {
+      padding: 20px 24px !important;
+      border-top: 1px solid #f1f5f9 !important;
+      background: #fafafa !important;
+      margin-top: auto !important;
+      flex-shrink: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 14px !important;
+    }
+
+    .cart-totals-sheet {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+    }
+
+    .total-line {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+
+    .total-line strong {
+      font-size: 1rem !important;
+      color: #1e293b !important;
+    }
+
+    .grand-price {
+      font-size: 1.35rem !important;
+      font-weight: 800 !important;
+      color: #ef4444 !important;
+    }
+
+    /* Nút Thanh Toán */
+    .cart-drawer-footer .btn-primary,
+    .cart-drawer-footer button {
+      width: 100% !important;
+      height: 48px !important;
+      background: linear-gradient(135deg, #f87171, #ef4444) !important;
+      border: none !important;
+      border-radius: 12px !important;
+      color: #ffffff !important;
+      font-size: 0.95rem !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.28) !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .cart-drawer-footer .btn-primary:hover,
+    .cart-drawer-footer button:hover {
+      opacity: 0.95 !important;
+      transform: translateY(-1px) !important;
+    }
+Bước 2: Bổ sung logic hiển thị sản phẩm & giỏ trốngKéo xuống cuối cùng file user-profile.html, tìm vào khối thẻ <script> (ngay trước </body>), dán thêm các hàm sau vào:   JavaScript    // ==============================================================
+    // XỬ LÝ MỞ / ĐÓNG VÀ NẠP SẢN PHẨM TRONG GIỎ HÀNG
+    // ==============================================================
+    function openCartDrawer() {
+      const overlay = document.getElementById('cartDrawerOverlay');
+      if (overlay) {
+        overlay.classList.add('active', 'open');
+        overlay.style.display = 'block';
+      }
+      renderCartDrawerItems();
+    }
+
+    function closeCartDrawer() {
+      const overlay = document.getElementById('cartDrawerOverlay');
+      if (overlay) {
+        overlay.classList.remove('active', 'open');
+        overlay.style.display = 'none';
+      }
+    }
+
+    function renderCartDrawerItems() {
+      const container = document.getElementById('cartItemsContainer');
+      const grandTotalEl = document.getElementById('cartGrandTotal');
+      if (!container) return;
+
+      let cart = JSON.parse(localStorage.getItem('artfair_cart') || '[]');
+      
+      // Nếu giỏ hàng trống: Hiện giao diện Empty State chuyên nghiệp
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; height:100%; margin:auto 0; padding:30px 10px;">
+            <i class="fa-solid fa-bag-shopping" style="font-size:3.2rem; color:#cbd5e1; margin-bottom:14px;"></i>
+            <h4 style="margin:0 0 6px 0; color:#1e293b; font-size:1.05rem; font-weight:700;">Giỏ hàng của bạn đang trống</h4>
+            <p style="margin:0 0 20px 0; color:#64748b; font-size:0.85rem; line-height:1.5; max-width:260px;">Hãy dạo chợ phiên để chọn mua bản quyền các tác phẩm ưng ý.</p>
+            <a href="index.html#gallery-section" class="btn btn-outline" style="border:1.5px solid #ef4444; color:#ef4444; border-radius:20px; padding:8px 20px; font-weight:700; text-decoration:none; font-size:0.85rem;">Khám Phá Chợ Phiên</a>
+          </div>
+        `;
+        if (grandTotalEl) grandTotalEl.textContent = '$0 USD';
+        return;
+      }
+
+      // Nếu có sản phẩm: Render danh sách sản phẩm
+      let total = 0;
+      container.innerHTML = cart.map((item, idx) => {
+        total += Number(item.price || 0);
+        return `
+          <div style="display:flex; gap:14px; padding:12px 0; border-bottom:1px solid #f1f5f9; align-items:center;">
+            <img src="${item.img || '45fbff086b31157aa2e23b94f086bd06.jpg'}" style="width:58px; height:58px; border-radius:10px; object-fit:cover; border:1px solid #f1f5f9;">
+            <div style="flex:1; min-width:0;">
+              <h5 style="margin:0; font-size:0.88rem; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</h5>
+              <span style="font-size:0.75rem; color:#64748b;">${item.tierName || 'Bản quyền thương mại'}</span>
+              <strong style="display:block; color:#ef4444; font-size:0.92rem; margin-top:2px;">$${item.price} USD</strong>
+            </div>
+            <button onclick="removeCartItemFromDrawer(${idx})" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; padding:0 6px;">&times;</button>
+          </div>
+        `;
+      }).join('');
+
+      if (grandTotalEl) grandTotalEl.textContent = '$' + total + ' USD';
+    }
+
+    function removeCartItemFromDrawer(idx) {
+      let cart = JSON.parse(localStorage.getItem('artfair_cart') || '[]');
+      cart.splice(idx, 1);
+      localStorage.setItem('artfair_cart', JSON.stringify(cart));
+      renderCartDrawerItems();
+      const badge = document.getElementById('cartCountBadge');
+      if (badge) badge.textContent = cart.length;
+    } 
+</style>
+</head>
+<body class="user-dashboard-page">
+
+  <!-- Single-Row Compact Header Navigation -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-container single-row-header">
+      <!-- Brand Logo -->
+      <a href="index.html" class="brand-logo" id="brandLogo">
+        <div class="logo-symbol">
+          <span class="logo-dot"></span>
+          <span class="logo-brush"><i class="fa-solid fa-palette"></i></span>
+        </div>
+        <div class="logo-text-group">
+          <span class="logo-title">ARTFAIR</span>
+          <span class="logo-tagline">HỘI CHỢ NGHỆ THUẬT MỞ</span>
+        </div>
+      </a>
+
+      <!-- Compact Nav Links (1 Row) -->
+      <nav class="main-nav">
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link"><i class="fa-solid fa-compass"></i> Chợ Phiên</a></li>
+          <li><a href="index.html#artist-booths" class="nav-link">Gian Hàng Nghệ Sĩ</a></li>
+          <li><a href="index.html#license-calculator" class="nav-link">Bảng Giá Bản Quyền</a></li>
+          <li><a href="#" class="nav-link active" onclick="navigateToUserProfile()">Trang Cá Nhân</a></li>
+        </ul>
+      </nav>
+
+      <!-- Compact Search Bar -->
+      <div class="header-search-bar">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="dashSearchInput" placeholder="Tìm tác phẩm, bản quyền..." autocomplete="off">
+      </div>
+
+      <!-- Action Buttons (1 Row) -->
+      <div class="header-actions">
+        <button class="icon-action-btn" id="btnHeaderCart" title="Giỏ hàng bản quyền" onclick="openCartDrawer()">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="action-counter-badge" id="cartCountBadge">0</span>
+        </button>
+
+        <div class="user-auth-zone" id="userAuthZone">
+          <div class="logged-in-profile" id="loggedInProfile">
+            <div class="user-avatar-pill" id="userAvatarPill" onclick="navigateToUserProfile()">
+              <img src="2e72c41b49afad2d08530b6a0475ba66.jpg" alt="Avatar" class="avatar-img" id="userAvatarImg">
+              <span class="user-name" id="userNameLabel">Hoàng My</span>
+              <i class="fa-solid fa-chevron-down arrow-down"></i>
+            </div>
+            <div class="user-dropdown-menu" id="userDropdownMenu">
+              <div class="dropdown-header">
+                <p class="dropdown-user-name" id="dropdownUserName">Hoàng My</p>
+                <p class="dropdown-user-role" id="dropdownUserRole">Chủ Shop POD & Collector</p>
+              </div>
+              <ul class="dropdown-list">
+                <li><a href="#" onclick="switchRoleView('collector')"><i class="fa-solid fa-bag-shopping"></i> Giao Diện Người Mua</a></li>
+                <li><a href="#" onclick="switchRoleView('artist')"><i class="fa-solid fa-palette"></i> Giao Diện Creator Studio</a></li>
+                <li class="divider"></li>
+                <li><a href="#" id="btnLogout" class="text-danger" onclick="handleDashboardLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng Xuất</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <button class="mobile-toggle-btn" id="mobileMenuToggle" aria-label="Mở menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Nav -->
+<div class="mobile-nav-drawer" id="mobileNavDrawer" style="display: none !important;">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <span class="logo-brush"><i class="fa-solid fa-palette"></i></span>
+        <span class="logo-title">ARTFAIR</span>
+      </div>
+      <button class="drawer-close-btn" id="closeMobileNav">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <ul class="mobile-links">
+        <li><a href="index.html" class="mobile-link">← Chợ Phiên Trực Tuyến</a></li>
+        <li><a href="#" class="mobile-link" onclick="switchRoleView('collector')">Giao Diện Người Mua</a></li>
+        <li><a href="#" class="mobile-link" onclick="switchRoleView('artist')">Giao Diện Creator Studio</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Dashboard Top Banner & User Profile Header -->
+  <section class="dashboard-hero-header">
+    <div class="section-container">
+      <div class="dashboard-profile-card">
+        
+        <div class="dash-avatar-col">
+          <img src="2e72c41b49afad2d08530b6a0475ba66.jpg" alt="User Avatar" id="dashUserAvatar" class="dash-avatar">
+        </div>
+
+        <div class="dash-info-col">
+          <div class="dash-name-row">
+            <h1 class="dash-user-name" id="dashUserName">Hoàng My (GenZ POD Shop)</h1>
+            <span class="dash-role-badge" id="dashRoleBadge">🛍️ Người Mua / POD Shop Owner</span>
+          </div>
+
+          <p class="dash-user-email" id="dashUserEmail">my.streetwear@gmail.com</p>
+          <p class="dash-user-bio" id="dashUserBio">"Sáng lập GenZ Streetwear Brand. Chuyên sưu tầm bản quyền hình in áo thun, poster decor và quà tặng nghệ thuật."</p>
+        </div>
+
+        <!-- Role Switcher Toggle for Judge/Testing -->
+        <div class="dash-role-switcher-col">
+          <div class="role-switch-box">
+            <span class="switch-title"><i class="fa-solid fa-sliders"></i> Chế Độ Hiển Thị:</span>
+            <div class="role-toggle-btn-group">
+              <button class="btn btn-sm btn-outline active" id="btnRoleBuyer" onclick="switchRoleView('collector')">
+                <i class="fa-solid fa-bag-shopping"></i> Người Mua (Buyer)
+              </button>
+              <button class="btn btn-sm btn-outline" id="btnRoleCreator" onclick="switchRoleView('artist')">
+                <i class="fa-solid fa-palette"></i> Người Sáng Tạo (Creator)
+              </button>
+            </div>
+            <span class="role-tip">*Bạn có thể chuyển đổi linh hoạt giữa 2 vai trò để kiểm thử</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- DASHBOARD MAIN BODY (ROLE A: BUYER VS ROLE B: CREATOR) -->
+  <!-- ========================================================================= -->
+  <main class="dashboard-main-content">
+    <div class="section-container">
+
+      <!-- ===================================================================== -->
+      <!-- VIEW A: BUYER DASHBOARD (NGƯỜI MUA / SHOP POD / COLLECTOR) -->
+      <!-- ===================================================================== -->
+      <div class="dashboard-view-mode active" id="viewBuyerDashboard">
+        
+        <!-- Buyer Tabs Nav -->
+        <div class="dash-tabs-nav">
+          <button class="dash-tab-btn active" data-buyertab="following" onclick="switchBuyerTab('following')">
+            <i class="fa-solid fa-user-check"></i> Tác Giả Đang Theo Dõi (<span id="countFollowing">4</span>)
+          </button>
+          
+          <button class="dash-tab-btn" data-buyertab="tracker" onclick="switchBuyerTab('tracker')">
+            <i class="fa-solid fa-clock-rotate-left"></i> Tiến Độ Commission & Đơn Hàng (<span id="countLiveCommissions">2</span>)
+            <span class="pulse-status-badge">Live</span>
+          </button>
+          
+          <button class="dash-tab-btn" data-buyertab="collector" onclick="switchBuyerTab('collector')">
+            <i class="fa-solid fa-file-contract"></i> Kho Tranh Đã Mua & Chứng Nhận (<span id="countLicenses">2</span>)
+          </button>
+        </div>
+
+        <!-- BUYER TAB 1: FOLLOWING ARTISTS -->
+        <div class="buyer-tab-pane active" id="paneBuyerFollowing">
+          <div class="section-sub-header">
+            <h3>Danh Sách Tác Giả Bạn Đang Theo Dõi</h3>
+            <p>Nhận thông báo tự động mỗi khi artist phát hành bộ sưu tập mới hoặc mở slot Commission.</p>
+          </div>
+
+          <div class="following-artists-grid" id="followingArtistsGrid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- BUYER TAB 2: LIVE PROGRESS TRACKER (Tiến độ đơn hàng & Commission) -->
+        <div class="buyer-tab-pane" id="paneBuyerTracker">
+          <div class="section-sub-header">
+            <h3>Trung Tâm Theo Dõi Tiến Độ Đơn Hàng & Commission</h3>
+            <p>Theo dõi thời gian thực quy trình thiết kế từ brief ý tưởng, phác thảo thô đến nghiệm thu bàn giao file gốc.</p>
+          </div>
+
+          <div class="live-tracker-list" id="liveTrackerList">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- BUYER TAB 3: COLLECTOR HUB (Kho tranh đã mua & Tải chứng nhận) -->
+        <div class="buyer-tab-pane" id="paneBuyerCollector">
+          <div class="section-sub-header">
+            <h3>Kho Tác Phẩm Đã Sở Hữu Bản Quyền</h3>
+            <p>Tải xuống file gốc độ phân giải cao (.PSD/.PNG 300-600 DPI) và xuất Giấy chứng nhận bản quyền pháp lý PDF.</p>
+          </div>
+
+          <div class="purchased-licenses-grid" id="purchasedLicensesGrid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW B: CREATOR DASHBOARD (NGƯỜI SÁNG TẠO / HỌA SĨ / CREATOR STUDIO) -->
+      <!-- ===================================================================== -->
+      <div class="dashboard-view-mode" id="viewCreatorDashboard">
+        
+        <!-- Creator Quick Control Bar -->
+        <div class="creator-toolbar-card">
+          <div class="toolbar-status-group">
+            <span class="status-label">Trạng Thái Nhận Đơn Sáng Tác:</span>
+            <div class="status-toggle-container">
+              <button class="status-toggle-btn active" id="btnStatusAccepting" onclick="setCreatorActiveStatus(true)">
+                <i class="fa-solid fa-circle text-mint"></i> 🟢 Còn Nhận Đơn Commission
+              </button>
+              <button class="status-toggle-btn" id="btnStatusBusy" onclick="setCreatorActiveStatus(false)">
+                <i class="fa-solid fa-circle text-danger"></i> 🔴 Đã Kín Lịch Mùa Này
+              </button>
+            </div>
+          </div>
+
+          <div class="toolbar-actions-group">
+            <button class="btn btn-outline btn-sm" onclick="openEditProfileModal()">
+              <i class="fa-solid fa-pen-to-square"></i> Sửa Thông Tin Cá Nhân / Cover
+            </button>
+            <button class="btn btn-primary btn-sm pulse-glow" onclick="openCreatorStudioModal()">
+              <i class="fa-solid fa-cloud-arrow-up"></i> + Đăng Tranh / Artwork Mới
+            </button>
+          </div>
+        </div>
+
+        <!-- Creator Metrics Bar -->
+        <div class="creator-metrics-grid">
+          <div class="creator-metric-card">
+            <span class="metric-title">Tổng Doanh Thu Bản Quyền</span>
+            <strong class="metric-val text-primary">$14,250 USD</strong>
+            <span class="metric-sub">~ 361,950,000 VNĐ</span>
+          </div>
+          <div class="creator-metric-card">
+            <span class="metric-title">Tác Phẩm Đã Bán</span>
+            <strong class="metric-val">98 Tác Phẩm</strong>
+            <span class="metric-sub">85% Bản quyền POD</span>
+          </div>
+          <div class="creator-metric-card">
+            <span class="metric-title">Yêu Cầu Commission Đang Chờ</span>
+            <strong class="metric-val text-warning">2 Đơn Mới</strong>
+            <span class="metric-sub">Phản hồi trung bình &lt; 1h</span>
+          </div>
+          <div class="creator-metric-card">
+            <span class="metric-title">Đánh Giá Trung Bình</span>
+            <strong class="metric-val text-mint">4.90 ★</strong>
+            <span class="metric-sub">Từ 86 người mua</span>
+          </div>
+        </div>
+
+        <!-- Creator Tabs Nav -->
+        <div class="dash-tabs-nav">
+          <button class="dash-tab-btn active" data-creatortab="inbox" onclick="switchCreatorTab('inbox')">
+            <i class="fa-solid fa-inbox"></i> Hộp Thư Commission (<span id="countCreatorInbox">2</span>)
+          </button>
+
+          <button class="dash-tab-btn" data-creatortab="myartworks" onclick="switchCreatorTab('myartworks')">
+            <i class="fa-solid fa-images"></i> Quản Lý Tác Phẩm Đã Đăng
+          </button>
+        </div>
+
+        <!-- CREATOR TAB 1: COMMISSION INBOX (Yêu cầu sáng tác gửi tới) -->
+        <div class="creator-tab-pane active" id="paneCreatorInbox">
+          <div class="section-sub-header">
+            <h3>Hộp Thư Quản Lý Yêu Cầu Commission Từ Khách Hàng</h3>
+            <p>Xem brief chi tiết, chấp nhận đơn, từ chối hoặc cập nhật tiến độ vẽ cho khách hàng.</p>
+          </div>
+
+          <div class="commission-inbox-list" id="commissionInboxList">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- CREATOR TAB 2: MY ARTWORKS MANAGEMENT -->
+        <div class="creator-tab-pane" id="paneCreatorMyArtworks">
+          <div class="section-sub-header">
+            <h3>Kho Tác Phẩm Đã Đăng Bán</h3>
+            <p>Quản lý mức giá bản quyền từ $50 đến $3,000 và trạng thái hiển thị trên chợ phiên.</p>
+          </div>
+
+          <div class="artwork-grid-container" id="creatorArtworksGrid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODALS & OVERLAYS -->
+  <!-- ========================================================================= -->
+
+  <!-- 1. CERTIFICATE OF COPYRIGHT MODAL (PDF LEGAL CERTIFICATE) -->
+  <div class="modal-overlay" id="certificateModalOverlay">
+    <div class="modal-container certificate-modal-box">
+      <button class="modal-close-btn" onclick="closeCertificateModal()">&times;</button>
+      
+      <div class="certificate-paper-frame" id="certificatePaper">
+        <div class="cert-border-gold">
+          <div class="cert-header">
+            <div class="cert-logo">🎨 ARTFAIR LEGAL SEAL</div>
+            <h2 class="cert-title">GIẤY CHỨNG NHẬN BẢN QUYỀN THƯƠNG MẠI</h2>
+            <p class="cert-sub">CERTIFICATE OF DIGITAL ARTWORK COPYRIGHT LICENSING</p>
+          </div>
+
+          <div class="cert-body">
+            <p class="cert-text">
+              Giấy chứng nhận này xác nhận rằng bên sở hữu được cấp phép 
+              <strong id="certLicenseOwner">Hoàng My (GenZ POD Shop)</strong> 
+              đã sở hữu hợp pháp gói bản quyền:
+            </p>
+
+            <div class="cert-artwork-summary">
+              <img src="" alt="Certificate Artwork" id="certArtworkImg" class="cert-thumb">
+              <div>
+                <h3 id="certArtworkTitle">Tên Tác Phẩm</h3>
+                <p>Tác giả sáng tác: <strong id="certArtistName">Kiệt Nguyễn (StreetArt Co.)</strong></p>
+                <p>Gói bản quyền: <strong id="certLicenseTier" class="text-primary">Thương Mại POD Mở Rộng ($550)</strong></p>
+                <p>Định dạng bàn giao: <strong id="certFormats">AI Vector CMYK, EPS, PNG 600 DPI</strong></p>
+              </div>
+            </div>
+
+            <div class="cert-details-table">
+              <div class="cert-cell">
+                <span>Mã số chứng thư:</span>
+                <strong id="certCodeVal">CERT-POD-88219-KN</strong>
+              </div>
+              <div class="cert-cell">
+                <span>Ngày cấp phép:</span>
+                <strong id="certDateVal">15/09/2026</strong>
+              </div>
+              <div class="cert-cell">
+                <span>Mã định danh Hash ID:</span>
+                <strong>0x88f2c...99a21b (Blockchain Verified)</strong>
+              </div>
+              <div class="cert-cell">
+                <span>Phạm vi kinh doanh:</span>
+                <strong>Toàn cầu (Shopee, Etsy, Amazon, TikTok Shop)</strong>
+              </div>
+            </div>
+
+            <div class="cert-footer">
+              <div class="cert-seal">
+                <i class="fa-solid fa-stamp"></i>
+                <span>ARTFAIR<br>VERIFIED</span>
+              </div>
+              <div class="cert-sign">
+                <p>Đại Diện Hội Đồng Bản Quyền ARTFAIR</p>
+                <strong class="sign-font">Minh Trí Admin</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-action-bar">
+        <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> In Giấy Chứng Nhận</button>
+        <button class="btn btn-primary" onclick="downloadCertificatePDF()"><i class="fa-solid fa-download"></i> Tải PDF Chứng Nhận</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. CREATOR STUDIO: UPLOAD NEW ARTWORK MODAL -->
+  <div class="modal-overlay" id="creatorStudioModalOverlay">
+    <div class="modal-container auth-modal-box max-w-650">
+      <button class="modal-close-btn" onclick="closeCreatorStudioModal()">&times;</button>
+      
+      <div class="modal-header-block">
+        <h3><i class="fa-solid fa-cloud-arrow-up text-primary"></i> Creator Studio - Đăng Tranh Mới</h3>
+        <p class="form-sub">Tải tác phẩm mới lên chợ phiên ARTFAIR và thiết lập khung giá bản quyền.</p>
+      </div>
+
+      <form id="formNewArtwork" onsubmit="handleNewArtworkSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Tên Tác Phẩm Nghệ Thuật:</label>
+          <input type="text" id="newArtTitle" class="form-input" placeholder="Ví dụ: Mascot Rồng Pop-Art Mùa Lễ Hội" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Danh Mục Ấn Phẩm:</label>
+            <select id="newArtCategory" class="custom-select form-input" required>
+              <option value="tshirt">Thiết kế áo thun / Merch POD</option>
+              <option value="illustration">Minh họa nghệ thuật</option>
+              <option value="logo">Logo & Thương hiệu</option>
+              <option value="decor">Trang trí Decor & Canvas</option>
+              <option value="typography">Font chữ nghệ thuật</option>
+              <option value="digital">Digital Art & Concept</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Giá Bản Quyền Cá Nhân ($):</label>
+            <input type="number" id="newArtPriceBase" class="form-input" value="65" min="50" max="3000" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mô Tả Tác Phẩm & Ý Tưởng:</label>
+          <textarea id="newArtDesc" class="form-input form-textarea" rows="3" placeholder="Mô tả chất liệu, phong cách, độ phân giải..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">File Ảnh Preview & File Gốc In Ấn (Giả lập):</label>
+          <div class="upload-dropzone" onclick="document.getElementById('newArtFileInput').click()">
+            <i class="fa-solid fa-file-image dropzone-icon"></i>
+            <p>Chọn tệp tác phẩm (.PNG / .PSD 300DPI)</p>
+            <input type="file" id="newArtFileInput" style="display:none;" accept="image/*">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 btn-lg">
+          <i class="fa-solid fa-paper-plane"></i> Đăng Tác Phẩm Lên Chợ Phiên
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. EDIT PROFILE MODAL -->
+  <div class="modal-overlay" id="editProfileModalOverlay">
+    <div class="modal-container auth-modal-box">
+      <button class="modal-close-btn" onclick="closeEditProfileModal()">&times;</button>
+      <h3><i class="fa-solid fa-pen-to-square text-primary"></i> Sửa Thông Tin Cá Nhân</h3>
+      <form id="formEditProfile" onsubmit="handleEditProfileSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Họ Tên / Bút Danh:</label>
+          <input type="text" id="editName" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tiểu Sử / Bio ngắn:</label>
+          <textarea id="editBio" class="form-input form-textarea" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 btn-lg">Lưu Thay Đổi</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CART DRAWER & TOAST -->
+  <div class="cart-drawer-overlay" id="cartDrawerOverlay">
+    <div class="cart-drawer-panel">
+      <div class="cart-drawer-header">
+        <h3><i class="fa-solid fa-bag-shopping text-primary"></i> Giỏ Hàng Bản Quyền</h3>
+        <button class="drawer-close-btn" onclick="closeCartDrawer()">&times;</button>
+      </div>
+      <div class="cart-drawer-body" id="cartItemsContainer"></div>
+      <div class="cart-drawer-footer">
+        <div class="cart-totals-sheet">
+          <div class="total-line grand-total-line">
+            <strong>Tổng thanh toán:</strong>
+            <strong class="grand-price" id="cartGrandTotal">$0 USD</strong>
+          </div>
+        </div>
+        <button class="btn btn-primary w-100 btn-lg" onclick="alert('Đã thanh toán!')">Thanh Toán</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+<!-- Shared Data & Page Scripts -->
+  <script src="artists-data.js"></script>
+  <script src="user-profile.js"></script>
+
+  <script>
+    // ==============================================================
+    // 1. LẤY THÔNG TIN TÀI KHOẢN ĐĂNG NHẬP THỰC TẾ
+    // ==============================================================
+    function getActiveUserData() {
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem('artfair_user') || '{}');
+      } catch (e) {
+        user = {};
+      }
+
+      const rawName = user.name || 'Thành Viên Mới';
+      const cleanName = rawName.replace(/\s*\((Google\vert{}Facebook\vert{}Artist\vert{}Collector\vert{}Creator)\)/gi, '').trim();
+      const email = user.email || (cleanName.toLowerCase().replace(/[^a-z0-9]/g, '') + '@artfair.vn');
+      const registeredRole = localStorage.getItem('artfair_active_role') || user.role || 'collector';
+
+      return { rawName, cleanName, email, role: registeredRole };
+    }
+
+    // ==============================================================
+    // 2. CHUYỂN ĐỔI VAI TRÒ GIỮA BUYER & CREATOR
+    // ==============================================================
+    function switchRoleView(role) {
+      const user = getActiveUserData();
+      const activeRole = role === 'artist' ? 'artist' : 'collector';
+      localStorage.setItem('artfair_active_role', activeRole);
+
+      const isArtist = activeRole === 'artist';
+
+      const headerDisplayName = isArtist ? `${user.cleanName} (Artist)` : `${user.cleanName} (Collector)`;
+      const dashDisplayName = isArtist 
+        ? `${user.cleanName.toUpperCase()} (PRO CREATOR STUDIO)` 
+        : `${user.cleanName.toUpperCase()} (GENZ POD SHOP)`;
+
+      const roleBadgeText = isArtist ? '🎨 Người Sáng Tạo / Pro Creator Studio' : '🛍️ Người Mua / POD Shop Owner';
+      const roleBadgeClass = isArtist ? 'dash-role-badge badge-creator' : 'dash-role-badge';
+      const roleRoleDesc = isArtist ? 'Pro Creator Studio • Artist' : 'Chủ Shop POD & Collector';
+
+      const roleBio = isArtist
+        ? `"Họa sĩ minh họa số hóa & Concept Artist. Nhận sáng tác tranh độc bản, thiết kế áo thun POD và cấp bản quyền thương mại."`
+        : `"Sáng lập thương hiệu Streetwear trẻ. Chuyên sưu tầm bản quyền hình in áo thun, poster decor và đặt vẽ Commission độc bản."`;
+
+      // Cập nhật Header
+      const userNameLabel = document.getElementById('userNameLabel');
+      const dropdownUserName = document.getElementById('dropdownUserName');
+      const dropdownUserRole = document.getElementById('dropdownUserRole');
+      if (userNameLabel) userNameLabel.textContent = headerDisplayName;
+      if (dropdownUserName) dropdownUserName.textContent = user.cleanName;
+      if (dropdownUserRole) dropdownUserRole.textContent = roleRoleDesc;
+
+      // Cập nhật Hero Banner
+      const dashUserName = document.getElementById('dashUserName');
+      const dashRoleBadge = document.getElementById('dashRoleBadge');
+      const dashUserEmail = document.getElementById('dashUserEmail');
+      const dashUserBio = document.getElementById('dashUserBio');
+      if (dashUserName) dashUserName.textContent = dashDisplayName;
+      if (dashRoleBadge) {
+        dashRoleBadge.textContent = roleBadgeText;
+        dashRoleBadge.className = roleBadgeClass;
+      }
+      if (dashUserEmail) dashUserEmail.textContent = user.email;
+      if (dashUserBio) dashUserBio.textContent = roleBio;
+
+      // Đổi view Dashboard
+      const viewBuyer = document.getElementById('viewBuyerDashboard');
+      const viewCreator = document.getElementById('viewCreatorDashboard');
+      const btnBuyer = document.getElementById('btnRoleBuyer');
+      const btnCreator = document.getElementById('btnRoleCreator');
+
+      if (viewBuyer) viewBuyer.classList.toggle('active', !isArtist);
+      if (viewCreator) {
+        viewCreator.classList.toggle('active', isArtist);
+        viewCreator.style.display = isArtist ? 'block' : 'none';
+      }
+      if (btnBuyer) btnBuyer.classList.toggle('active', !isArtist);
+      if (btnCreator) btnCreator.classList.toggle('active', isArtist);
+
+      if (isArtist) {
+        renderCreatorInbox();
+        renderCreatorArtworks();
+      } else {
+        renderPurchasedLicenses();
+        renderLiveCommissionTracker();
+        renderFollowingArtists();
+      }
+    }
+
+    // ==============================================================
+    // 3. CHUYỂN ĐỔI TAB BÊN PHÍA NGƯỜI MUA (BUYER DASHBOARD)
+    // ==============================================================
+    function switchBuyerTab(tabKey) {
+      document.querySelectorAll('[data-buyertab]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-buyertab') === tabKey);
+      });
+
+      const paneFollowing = document.getElementById('paneBuyerFollowing');
+      const paneTracker = document.getElementById('paneBuyerTracker');
+      const paneCollector = document.getElementById('paneBuyerCollector');
+
+      if (paneFollowing) paneFollowing.style.display = tabKey === 'following' ? 'block' : 'none';
+      if (paneTracker) paneTracker.style.display = tabKey === 'tracker' ? 'block' : 'none';
+      if (paneCollector) paneCollector.style.display = tabKey === 'collector' ? 'block' : 'none';
+
+      if (tabKey === 'following') renderFollowingArtists();
+      if (tabKey === 'tracker') renderLiveCommissionTracker();
+      if (tabKey === 'collector') renderPurchasedLicenses();
+    }
+
+    // ==============================================================
+    // 4. HIỂN THỊ KHO BẢN QUYỀN ĐÃ MUA (#purchasedLicensesGrid)
+    // ==============================================================
+    function renderPurchasedLicenses() {
+      const grid = document.getElementById('purchasedLicensesGrid');
+      if (!grid) return;
+
+      let licenses = JSON.parse(localStorage.getItem('artfair_purchased_licenses') || 'null');
+      if (!licenses || licenses.length === 0) {
+        licenses = [
+          {
+            code: 'LIC-2026-901',
+            title: 'Cyberpunk Streetwear Vector Edition',
+            artist: 'Kiệt Nguyễn (StreetArt Co.)',
+            tier: 'Thương Mại POD Mở Rộng ($550)',
+            date: '2026-09-15',
+            formats: 'AI Vector CMYK, EPS, PNG 600 DPI',
+            img: '34afaac0faa70a1bb6c4b5ad89b77756-2.jpg'
+          },
+          {
+            code: 'LIC-2026-902',
+            title: 'Khu Vườn Bí Mật Của Nàng Thơ',
+            artist: 'Hoài Thương',
+            tier: 'Thương Mại POD Nhỏ ($190)',
+            date: '2026-09-18',
+            formats: 'PSD Layered 300 DPI, TIFF',
+            img: '45fbff086b31157aa2e23b94f086bd06.jpg'
+          }
+        ];
+        localStorage.setItem('artfair_purchased_licenses', JSON.stringify(licenses));
+      }
+
+      const countEl = document.getElementById('countLicenses');
+      if (countEl) countEl.textContent = licenses.length;
+
+      grid.innerHTML = licenses.map(item => `
+        <div class="purchased-license-card">
+          <img src="${item.img}" alt="${item.title}">
+          <div>
+            <span>${item.code}</span>
+            <h4>${item.title}</h4>
+            <p>Tác giả: <strong>${item.artist}</strong></p>
+            <p><i class="fa-solid fa-certificate text-primary"></i> Gói: <strong>${item.tier}</strong></p>
+            <p>Ngày thanh toán: <strong>${item.date}</strong></p>
+            <div class="license-actions">
+              <button class="btn btn-primary" onclick="downloadArtworkFile('${item.title}', '${item.formats}')">
+                <i class="fa-solid fa-cloud-arrow-down"></i> Tải File Gốc (${item.formats})
+              </button>
+              <button class="btn btn-outline" onclick="openCertificateModal('${item.code}', '${item.title}', '${item.artist}', '${item.tier}', '${item.formats}', '${item.date}', '${item.img}')">
+                <i class="fa-solid fa-file-pdf text-danger"></i> Xuất Chứng Nhận PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ==============================================================
+    // 5. MODAL XUẤT CHỨNG NHẬN BẢN QUYỀN PDF & TẢI FILE GỐC
+    // ==============================================================
+    function openCertificateModal(code, title, artist, tier, formats, date, img) {
+      const modal = document.getElementById('certificateModalOverlay');
+      if (!modal) return;
+
+      const user = getActiveUserData();
+      const ownerEl = document.getElementById('certLicenseOwner');
+      if (ownerEl) ownerEl.textContent = `${user.cleanName} (${user.role === 'artist' ? 'Pro Creator Studio' : 'GenZ POD Shop'})`;
+
+      const imgEl = document.getElementById('certArtworkImg');
+      if (imgEl && img) imgEl.src = img;
+
+      const titleEl = document.getElementById('certArtworkTitle');
+      if (titleEl) titleEl.textContent = title;
+
+      const artistEl = document.getElementById('certArtistName');
+      if (artistEl) artistEl.textContent = artist;
+
+      const tierEl = document.getElementById('certLicenseTier');
+      if (tierEl) tierEl.textContent = tier;
+
+      const formatsEl = document.getElementById('certFormats');
+      if (formatsEl) formatsEl.textContent = formats;
+
+      const codeEl = document.getElementById('certCodeVal');
+      if (codeEl) codeEl.textContent = code;
+
+      const dateEl = document.getElementById('certDateVal');
+      if (dateEl) dateEl.textContent = date;
+
+      modal.classList.add('active', 'open');
+      modal.style.display = 'flex';
+    }
+
+    function closeCertificateModal() {
+      const modal = document.getElementById('certificateModalOverlay');
+      if (modal) {
+        modal.classList.remove('active', 'open');
+        modal.style.display = 'none';
+      }
+    }
+
+    function downloadCertificatePDF() {
+      alert('📄 Đang kết xuất Giấy Chứng Nhận Bản Quyền PDF điện tử có mộc kiểm duyệt ARTFAIR Verified...');
+      window.print();
+    }
+
+    function downloadArtworkFile(title, formats) {
+      alert(`📥 Bắt đầu tải file gốc thiết kế "${title}".\nĐịnh dạng: ${formats}\nChuẩn in ấn 300 - 600 DPI.`);
+    }
+
+    // ==============================================================
+    // 6. TIẾN ĐỘ COMMISSION VÀ TÁC GIẢ THEO DÕI
+    // ==============================================================
+    function renderLiveCommissionTracker() {
+      const trackerList = document.getElementById('liveTrackerList');
+      if (!trackerList) return;
+
+      let comms = JSON.parse(localStorage.getItem('artfair_commissions') || '[]');
+      if (comms.length === 0) {
+        comms = [{
+          id: '#COMM-9824',
+          artist: 'Lan Chi (Chi Art Studio)',
+          title: 'Thiết Kế Áo Thun Pastel Mèo Chiêu Tài Y2K',
+          budget: '$250 USD',
+          deadline: '15/10/2026',
+          img: '45fbff086b31157aa2e23b94f086bd06.jpg'
+        }];
+      }
+
+      trackerList.innerHTML = comms.map(item => `
+        <div>
+          <img src="${item.img}" alt="${item.title}">
+          <div>
+            <h4>${item.title}</h4>
+            <p>Artist: <strong>${item.artist}</strong> • Mã đơn: <strong>${item.id}</strong></p>
+            <p>Ngân sách: <strong>${item.budget}</strong> • Hạn: <strong>${item.deadline}</strong></p>
+            <div style="background:#f8fafc; border:1px solid #f1f5f9; border-radius:12px; padding:12px 16px; margin-top:8px;">
+              <span style="font-size:0.8rem; font-weight:700; color:#10b981;">
+                ● Tiến độ hiện tại: Bước 1 - Tiếp nhận Brief & Phác thảo thô
+              </span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderFollowingArtists() {
+      const grid = document.getElementById('followingArtistsGrid');
+      if (!grid) return;
+
+      const artists = [
+        {
+          id: 'lanchi',
+          name: 'Lan Chi (Chi Art Studio)',
+          role: 'Chuyên Họa Màu Nước & Storybook',
+          bio: '"Kể lại những giấc mơ tuổi trẻ qua gam màu pastel dịu dàng và nét vẽ thanh tao."',
+          avatar: '2e72c41b49afad2d08530b6a0475ba66.jpg',
+          banner: '45fbff086b31157aa2e23b94f086bd06.jpg'
+        },
+        {
+          id: 'kietnguyen',
+          name: 'Kiệt Nguyễn (StreetArt Co.)',
+          role: 'Vector Graphic & T-Shirt Specialist',
+          bio: '"Chuyên thiết kế graphic tee, hoodie và merchandise cho các local brand trẻ."',
+          avatar: '34afaac0faa70a1bb6c4b5ad89b77756-2.jpg',
+          banner: '64606c0f0bec432548c54134316a58c7.jpg'
+        },
+        {
+          id: 'hoanglong',
+          name: 'Hoàng Long Art',
+          role: 'Fantasy Concept & Game Environment',
+          bio: '"Thổi hồn vào thế giới thần tiên và viễn tưởng kỳ ảo với ánh sáng huyền bí."',
+          avatar: 'd4c0ab69c4209ec4c049d75119d9c410.jpg',
+          banner: '45fbff086b31157aa2e23b94f086bd06.jpg'
+        },
+        {
+          id: 'hoaithuong',
+          name: 'Hoài Thương Art',
+          role: 'Botanical & Canvas Decor',
+          bio: '"Hơi thở thiên nhiên qua từng nét vẽ hoa cỏ, thích hợp cho tranh treo tường decor."',
+          avatar: '2e72c41b49afad2d08530b6a0475ba66.jpg',
+          banner: '34afaac0faa70a1bb6c4b5ad89b77756-2.jpg'
+        }
+      ];
+
+      grid.innerHTML = artists.map(art => `
+        <div class="booth-card">
+          <div class="booth-banner"><img src="${art.banner}" alt="${art.name}"></div>
+          <div class="booth-avatar-box"><img src="${art.avatar}" alt="${art.name}" class="booth-avatar"></div>
+          <div class="booth-body">
+            <h4 style="margin: 4px 0 2px 0; font-size: 1rem; font-weight: 700; color: #0f172a;">${art.name}</h4>
+            <p style="font-size: 0.78rem; color: #ef4444; font-weight: 600; margin: 0 0 6px 0;">${art.role}</p>
+            <p style="font-size: 0.8rem; color: #64748b; font-style: italic; line-height: 1.4; margin: 0 0 12px 0;">${art.bio}</p>
+            <div class="booth-actions">
+              <button class="btn btn-primary btn-sm" onclick="window.location.href='artist-profile.html'">
+                <i class="fa-solid fa-store"></i> Ghé Gian Hàng
+              </button>
+              <button class="btn btn-outline btn-sm" title="Hủy theo dõi" onclick="alert('Đã cập nhật danh sách theo dõi.')">
+                <i class="fa-solid fa-user-minus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ==============================================================
+    // 7. CÁC HÀM CỦA CREATOR (HỘP THƯ & TÁC PHẨM)
+    // ==============================================================
+    function renderCreatorInbox() {
+      const inboxList = document.getElementById('commissionInboxList');
+      if (!inboxList) return;
+
+      let inboxData = JSON.parse(localStorage.getItem('artfair_creator_inbox') || 'null');
+      if (!inboxData || inboxData.length === 0) {
+        inboxData = [
+          {
+            id: '#COMM-9824',
+            title: 'Thiết Kế Áo Thun Graphic Tee Mèo Cyberpunk Y2K',
+            client: 'Hoàng Phúc (Local Brand Saigon)',
+            package: 'Bản Quyền Thương Mại POD',
+            budget: '$350 USD (~ 8.890.000 VNĐ)',
+            deadline: '18/10/2026',
+            brief: 'Cần thiết kế phong cách Cyberpunk pha chút nét đường phố Sài Gòn, phối màu neon tím xanh, phân tách layer vector in ấn chuẩn DTG.',
+            img: '34afaac0faa70a1bb6c4b5ad89b77756-2.jpg'
+          },
+          {
+            id: '#COMM-7823',
+            title: 'Bộ Minh Họa Bìa Sách Tiểu Thuyết Kỳ Ảo "Ánh Sáng Rừng Đêm"',
+            client: 'Minh Thư BookLab',
+            package: 'Độc Quyền Toàn Phần (Full Buyout)',
+            budget: '$1,200 USD (~ 30.480.000 VNĐ)',
+            deadline: '25/10/2026',
+            brief: 'Minh họa bìa tiểu thuyết kèm bookmark, phong cách huyền ảo pastel, tông màu hoàng hôn và ánh sáng đom đóm độ phân giải 600 DPI.',
+            img: '45fbff086b31157aa2e23b94f086bd06.jpg'
+          }
+        ];
+        localStorage.setItem('artfair_creator_inbox', JSON.stringify(inboxData));
+      }
+
+      const countEl = document.getElementById('countCreatorInbox');
+      if (countEl) countEl.textContent = inboxData.length;
+
+      inboxList.innerHTML = inboxData.map((item, index) => `
+        <div class="commission-inbox-item" id="inbox-item-${index}">
+          <img src="${item.img}" alt="${item.title}">
+          <div>
+            <h4>${item.title}</h4>
+            <p>Khách hàng: <strong>${item.client}</strong> • Gói: <strong>${item.package}</strong> • Mã: <strong>${item.id}</strong></p>
+            <p>Ngân sách: <strong>${item.budget}</strong> • Hạn: <strong>${item.deadline}</strong></p>
+            <p class="brief-desc"><em>"${item.brief}"</em></p>
+            <div class="inbox-actions">
+              <button class="btn btn-primary" onclick="acceptCommissionItem(${index}, '${item.id}')">
+                <i class="fa-solid fa-check"></i> Chấp Nhận Vẽ Brief Này
+              </button>
+              <button class="btn btn-outline" onclick="declineCommissionItem(${index})">
+                <i class="fa-solid fa-xmark"></i> Từ Chối
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function acceptCommissionItem(index, code) {
+      alert(`🎉 Bạn đã chấp nhận Brief ${code}!\nQuy trình đã chuyển sang Bước 2: Bắt đầu vẽ phác thảo thô (Rough Sketch). Khách hàng sẽ nhận được thông báo qua email.`);
+      declineCommissionItem(index, false);
+    }
+
+    function declineCommissionItem(index, showAlert = true) {
+      let inboxData = JSON.parse(localStorage.getItem('artfair_creator_inbox') || '[]');
+      if (showAlert) alert('Đã từ chối tiếp nhận yêu cầu Commission này.');
+      inboxData.splice(index, 1);
+      localStorage.setItem('artfair_creator_inbox', JSON.stringify(inboxData));
+      renderCreatorInbox();
+    }
+
+    function renderCreatorArtworks() {
+      const grid = document.getElementById('creatorArtworksGrid');
+      if (!grid) return;
+
+      let arts = JSON.parse(localStorage.getItem('artfair_artist_artworks') || '[]');
+      if (arts.length === 0) {
+        arts = [
+          {
+            title: 'Concept Visual Cyberpunk "Neon 2026"',
+            category: 'digital',
+            price: '85',
+            desc: 'Artwork 3D minh họa thành phố viễn tưởng phong cách Cyberpunk.',
+            img: '34afaac0faa70a1bb6c4b5ad89b77756-2.jpg',
+            date: '28/09/2026'
+          },
+          {
+            title: 'Mascot Rồng Pop-Art Hội Chợ',
+            category: 'tshirt',
+            price: '65',
+            desc: 'Thiết kế vector graphic tee bản quyền POD mở rộng.',
+            img: '64606c0f0bec432548c54134316a58c7.jpg',
+            date: '25/09/2026'
+          }
+        ];
+      }
+
+      grid.innerHTML = arts.map(a => `
+        <div class="creator-art-card">
+          <img src="${a.img}" alt="${a.title}">
+          <div class="card-info">
+            <span style="font-size:0.72rem; color:#ef4444; font-weight:700; text-transform:uppercase;">#${a.category}</span>
+            <h4 style="margin:0; font-size:0.95rem; color:#1e293b; font-weight:700;">${a.title}</h4>
+            <p style="margin:0; font-size:0.78rem; color:#64748b; line-height:1.4;">${a.desc}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+              <strong style="color:#ef4444; font-size:1rem;">$${a.price} USD</strong>
+              <span style="font-size:0.72rem; color:#94a3b8;">${a.date}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    let uploadedImageBase64 = '';
+    function openCreatorStudioModal() {
+      const modal = document.getElementById('creatorStudioModalOverlay');
+      if (modal) { modal.classList.add('active'); modal.style.display = 'flex'; }
+      setupFileInput();
+    }
+
+    function closeCreatorStudioModal() {
+      const modal = document.getElementById('creatorStudioModalOverlay');
+      if (modal) { modal.classList.remove('active'); modal.style.display = 'none'; }
+    }
+
+    function setupFileInput() {
+      const input = document.getElementById('newArtFileInput');
+      if (input) {
+        input.onchange = function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+              uploadedImageBase64 = evt.target.result;
+              const drop = document.querySelector('.upload-dropzone');
+              if (drop) {
+                drop.innerHTML = `
+                  <img src="${uploadedImageBase64}" style="max-height:130px; border-radius:10px;">
+                  <p style="color:#10b981; margin:4px 0 0 0; font-weight:700;">✓ Đã tải: ${file.name}</p>
+                `;
+              }
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+      }
+    }
+
+    function handleNewArtworkSubmit(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const title = document.getElementById('newArtTitle').value.trim();
+      const category = document.getElementById('newArtCategory').value;
+      const price = document.getElementById('newArtPriceBase').value;
+      const desc = document.getElementById('newArtDesc').value.trim();
+      const img = uploadedImageBase64 || '45fbff086b31157aa2e23b94f086bd06.jpg';
+
+      let artworks = JSON.parse(localStorage.getItem('artfair_artist_artworks') || '[]');
+      artworks.unshift({
+        id: 'ART-' + Date.now(),
+        title,
+        category,
+        price,
+        desc,
+        img,
+        date: new Date().toLocaleDateString('vi-VN')
+      });
+      localStorage.setItem('artfair_artist_artworks', JSON.stringify(artworks));
+
+      closeCreatorStudioModal();
+      document.getElementById('formNewArtwork').reset();
+      renderCreatorArtworks();
+      switchCreatorTab('myartworks');
+      alert(`🎉 Đăng tác phẩm "${title}" lên ARTFAIR thành công!`);
+    }
+
+    function switchCreatorTab(tabKey) {
+      document.querySelectorAll('[data-creatortab]').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-creatortab') === tabKey);
+      });
+      const paneInbox = document.getElementById('paneCreatorInbox');
+      const paneArtworks = document.getElementById('paneCreatorMyArtworks');
+
+      if (tabKey === 'inbox') {
+        if (paneInbox) paneInbox.style.display = 'block';
+        if (paneArtworks) paneArtworks.style.display = 'none';
+        renderCreatorInbox();
+      } else {
+        if (paneInbox) paneInbox.style.display = 'none';
+        if (paneArtworks) paneArtworks.style.display = 'block';
+        renderCreatorArtworks();
+      }
+    }
+
+    function handleDashboardLogout() {
+      localStorage.removeItem('artfair_is_logged_in');
+      localStorage.removeItem('artfair_user');
+      localStorage.removeItem('artfair_active_role');
+      window.location.href = 'index.html';
+    }
+
+    // ==============================================================
+    // 8. TỰ ĐỘNG KHỞI TẠO VÀ BẮT LIÊN KẾT TAB (#paneBuyerCollector)
+    // ==============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = getActiveUserData();
+      const hash = window.location.hash;
+
+      // Nếu đi từ nút "Kho Bản Quyền Đã Mua" ở Header hoặc Menu
+      if (hash === '#paneBuyerCollector' || hash.includes('Collector')) {
+        switchRoleView('collector');
+        switchBuyerTab('collector');
+      } else if (hash === '#paneBuyerTracker' || hash.includes('Tracker')) {
+        switchRoleView('collector');
+        switchBuyerTab('tracker');
+      } else {
+        switchRoleView(user.role);
+        if (user.role !== 'artist') {
+          switchBuyerTab('collector'); // Mặc định mở Kho bản quyền
+        }
+      }
+    });
+  </script></body>
+</html>
